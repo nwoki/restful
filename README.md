@@ -1,4 +1,4 @@
 restful
 =======
 
-A ReST lib written in Qt to make using ReST easy
+A ReST library written in Qt to make using ReST easy.
