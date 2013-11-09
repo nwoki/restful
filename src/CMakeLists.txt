@@ -1,5 +1,7 @@
 set(restful_SRCS
+    collection.cpp
     connectionhandler.cpp
+    resource.cpp
     server.cpp
 )
 

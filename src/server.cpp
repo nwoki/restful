@@ -1,7 +1,9 @@
+#include "collection.h"
 #include "connectionhandler.h"
 #include "server.h"
 
 #include <QtCore/QDebug>
+#include <QtCore/QStringList>
 
 #include <QtNetwork/QTcpSocket>
 
@@ -10,8 +12,8 @@ class Server::Private
 {
 public:
     quint16 port;
+    QHash<QString, Collection*> collections;
 };
-
 
 
 Server::Server(quint16 port, QObject *parent)
@@ -54,5 +56,13 @@ Server::~Server()
 {
     delete d;
 }
+
+
+void Server::addCollection(Collection *collection)
+{
+    d->collections.insert(collection->path(), collection);
+}
+
+
 
 

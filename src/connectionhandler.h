@@ -15,10 +15,18 @@ class ConnectionHandler : public QObject
     Q_OBJECT
 
 public:
+    enum HttpRequestType {
+        GETRequestType = 0,
+        POSTRequestType,
+        PUTRequestType
+    };
+
     ConnectionHandler(QTcpSocket *socket, QObject *parent = 0);
     virtual ~ConnectionHandler();
 
 private:
+    void parseData();
+
     class Private;
     Private * const d;
 };
