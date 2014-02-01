@@ -6,6 +6,8 @@
 #include <QtCore/QString>
 #include <QtCore/QVariantHash>
 
+namespace RESTFul {
+
 class Resource : public QObject
 {
 public:
@@ -22,6 +24,8 @@ public:
 private:
     class Private;
     Private * const d;
+};
+
 };
 
 #endif  // RESOURCE_H

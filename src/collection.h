@@ -6,6 +6,8 @@
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 
+namespace RESTFul {
+
 class Collection
 {
 public:
@@ -25,6 +27,8 @@ private:
 
     class Private;
     Private * const d;
+};
+
 };
 
 

@@ -1,6 +1,6 @@
 #include "../src/resource.h"
 
-class MyResource : public Resource
+class MyResource : public RESTFul::Resource
 {
 
 public:

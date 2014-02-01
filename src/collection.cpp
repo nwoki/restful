@@ -4,6 +4,9 @@
 
 #include <QtCore/QDebug>
 
+
+namespace RESTFul {
+
 class Collection::Private
 {
 public:
@@ -43,4 +46,6 @@ QString Collection::path() const
 void Collection::setHttpStatusCode(ConnectionHandler::HttpStatusCode statusCode)
 {
     d->httpStatusCode = statusCode;
+}
+
 }

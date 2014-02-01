@@ -1,5 +1,7 @@
 #include "resource.h"
 
+namespace RESTFul {
+
 class Resource::Private
 {
 public:
@@ -24,4 +26,6 @@ Resource::~Resource()
 QString Resource::id() const
 {
     return d->id;
+}
+
 }

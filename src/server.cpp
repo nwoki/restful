@@ -8,6 +8,7 @@
 
 #include <QtNetwork/QTcpSocket>
 
+namespace RESTFul {
 
 class Server::Private
 {
@@ -65,6 +66,7 @@ void Server::addCollection(Collection *collection)
     d->collections.insert(collection->path(), collection);
 }
 
+}
 
 
 

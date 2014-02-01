@@ -8,6 +8,8 @@
  * @author Francesco Nwokeka <francesco.nwokeka@gmail.com>
  */
 
+namespace RESTFul {
+
 class Collection;
 
 class Server : public QTcpServer
@@ -29,6 +31,8 @@ private:
     class Private;
     Private * const d;
 };
+
+};      // RESTFul
 
 
 

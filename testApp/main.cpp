@@ -8,7 +8,7 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
-    Server server(8080);
+    RESTFul::Server server(8080);
 
 //     server.addRESTUrl("bla bla", ResourceHandler);
 

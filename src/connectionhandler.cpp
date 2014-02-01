@@ -5,6 +5,7 @@
 
 #include <QtNetwork/QTcpSocket>
 
+namespace RESTFul {
 
 class ConnectionHandler::Private
 {
@@ -213,5 +214,7 @@ void ConnectionHandler::setHttpStatusCode(ConnectionHandler::HttpStatusCode code
 {
     d->httpStatusCode = code;
 }
+
+};
 
 

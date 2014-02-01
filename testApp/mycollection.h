@@ -1,6 +1,6 @@
 #include <Collection>
 
-class MyCollection : public Collection
+class MyCollection : public RESTFul::Collection
 {
 public:
     MyCollection(const QString& path);
