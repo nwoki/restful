@@ -33,6 +33,24 @@ Collection::~Collection()
     delete d;
 }
 
+QByteArray Collection::collectionGet(const QString &resource)
+{
+    setHttpStatusCode(ConnectionHandler::HttpNotFound);
+    return QByteArray();
+}
+
+QByteArray Collection::collectionPost(const QString &resource)
+{
+    setHttpStatusCode(ConnectionHandler::HttpNotFound);
+    return QByteArray();
+}
+
+QByteArray Collection::collectionPut(const QString &resource)
+{
+    setHttpStatusCode(ConnectionHandler::HttpNotFound);
+    return QByteArray();
+}
+
 ConnectionHandler::HttpStatusCode Collection::httpStatusCode() const
 {
     return d->httpStatusCode;

@@ -16,9 +16,9 @@ public:
 
     QString path() const;
 
-    virtual QByteArray collectionGet(const QString &resource = QString()) = 0;
-    virtual QByteArray collectionPost(const QString &resource = QString()) = 0;
-    virtual QByteArray collectionPut(const QString &resource = QString()) = 0;
+    virtual QByteArray collectionGet(const QString &resource = QString());
+    virtual QByteArray collectionPost(const QString &resource = QString());
+    virtual QByteArray collectionPut(const QString &resource = QString());
 
     ConnectionHandler::HttpStatusCode httpStatusCode() const;
 
