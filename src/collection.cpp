@@ -1,9 +1,4 @@
 #include "collection.h"
-#include "resource.h"
-#include "resourcefactory.h"
-
-#include <QtCore/QDebug>
-
 
 namespace RESTFul {
 
