@@ -10,11 +10,13 @@ class ConnectionHandler::Private
 {
 public:
     QTcpSocket *socket;
-    QByteArray data;
+    QHash<QString, Collection*> collections;
+
+    // request info
+    QString requestData;
+    QVariantHash requestParameters;
     HttpRequestType requestType;
     QString requestUrl;
-    QHash<QString, Collection*> collections;
-    QVariantHash parameters;
 };
 
 ConnectionHandler::ConnectionHandler(QTcpSocket *socket, QHash<QString, Collection*> collections, QObject *parent)
@@ -25,8 +27,6 @@ ConnectionHandler::ConnectionHandler(QTcpSocket *socket, QHash<QString, Collecti
     d->collections = collections;
 
     connect(d->socket, &QIODevice::readyRead, [this] () {
-        d->data = d->socket->readAll();
-
         // parse received data
         parseData();
     });
@@ -52,18 +52,18 @@ void ConnectionHandler::parseData()
 {
     qDebug("ConnectionHandler::finishedReading");
 
+    QByteArray data;
+
     while (d->socket->bytesAvailable() != 0) {
-        d->data += d->socket->readAll();
+        data += d->socket->readAll();
     }
 
-    qDebug() << "GOT: " << d->data;
-
-    QTextStream streamData(d->data);
+    QTextStream streamData(data);
     QString line = streamData.readLine();
 
     // parse header
     while (!line.isEmpty()) {
-        qDebug() << "line: " << line;
+        // TODO store "Content-Type"
 
         // determine request type
         if (line.contains("HTTP")) {
@@ -92,13 +92,14 @@ void ConnectionHandler::parseData()
 
                 if (urlSplit.count() > 1) {
                     for (const QString &param : urlSplit.value(1).split('&')) {
-                        d->parameters.insert(param.split('=').first(), param.split('=').last());
+                        d->requestParameters.insert(param.split('=').first(), param.split('=').last());
                     }
                 }
             } else {
                 d->requestUrl = requestSplit.at(1);
 
-                // get POST/PUT data
+                // post/put data comes after a new line break which is what makes the while loop exit.
+                // so the parsing is done outside
             }
 
             qDebug() << d->requestUrl << " collection to call";
@@ -106,5 +107,8 @@ void ConnectionHandler::parseData()
 
         line = streamData.readLine();
     }
+
+    // post/put data. Saved "as is" so that developers can handle the data as they wish
+    d->requestData = streamData.readLine();
 }
 
