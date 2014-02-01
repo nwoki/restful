@@ -9,8 +9,9 @@ public:
 };
 
 
-Resource::Resource(const QString &resId)
-    : d(new Private(resId))
+Resource::Resource(const QString &resId, QObject *parent)
+    : QObject(parent)
+    , d(new Private(resId))
 {
 }
 
@@ -18,4 +19,9 @@ Resource::Resource(const QString &resId)
 Resource::~Resource()
 {
     delete d;
+}
+
+QString Resource::id() const
+{
+    return d->id;
 }

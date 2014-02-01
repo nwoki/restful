@@ -3,6 +3,7 @@
 #include "server.h"
 
 #include <QtCore/QDebug>
+#include <QtCore/QString>
 #include <QtCore/QStringList>
 
 #include <QtNetwork/QTcpSocket>
@@ -43,11 +44,12 @@ Server::Server(quint16 port, QObject *parent)
             }
 
             // create connection obj to handle the http request by itself
-            ConnectionHandler *connHandler = new ConnectionHandler(socket);
+            ConnectionHandler *connHandler = new ConnectionHandler(socket, d->collections);
         });
 
     } else {
         // TODO quit app?
+        qDebug("TODO quit app?");
     }
 }
 

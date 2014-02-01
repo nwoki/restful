@@ -2,19 +2,22 @@
 #define RESOURCE_H
 
 #include <QtCore/QByteArray>
+#include <QtCore/QObject>
 #include <QtCore/QString>
+#include <QtCore/QVariantHash>
 
-class Resource
+class Resource : public QObject
 {
 public:
-    Resource(const QString &resId);
+    Resource(const QString &resId, QObject *parent = 0);
     virtual ~Resource();
 
-    // TODO add QVariantHash to post/put methods (vars)
-    virtual QByteArray restGet() = 0;
-    virtual void restDelete() = 0;
-    virtual void restPost() = 0;
-    virtual void restPut() = 0;
+    QString id() const;
+
+    virtual void restGet(const QVariantHash vars) = 0;
+    virtual void restDelete(const QVariantHash vars) = 0;
+    virtual void restPost(const QVariantHash vars) = 0;
+    virtual void restPut(const QVariantHash vars) = 0;
 
 private:
     class Private;

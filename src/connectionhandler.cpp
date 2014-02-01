@@ -1,3 +1,4 @@
+#include "collection.h"
 #include "connectionhandler.h"
 
 #include <QtCore/QDebug>
@@ -11,14 +12,17 @@ public:
     QTcpSocket *socket;
     QByteArray data;
     HttpRequestType requestType;
-    QByteArray requestUrl;
+    QString requestUrl;
+    QHash<QString, Collection*> collections;
+    QVariantHash parameters;
 };
 
-ConnectionHandler::ConnectionHandler(QTcpSocket *socket, QObject *parent)
+ConnectionHandler::ConnectionHandler(QTcpSocket *socket, QHash<QString, Collection*> collections, QObject *parent)
     : QObject(parent)
     , d(new Private)
 {
     d->socket = socket;
+    d->collections = collections;
 
     connect(d->socket, &QIODevice::readyRead, [this] () {
         d->data = d->socket->readAll();
@@ -27,8 +31,10 @@ ConnectionHandler::ConnectionHandler(QTcpSocket *socket, QObject *parent)
         parseData();
     });
 
+    // TODO connect on error
+
     // delete on socket life end
-    connect(d->socket, &QTcpSocket::disconnected, [this]() {
+    connect(d->socket, &QTcpSocket::disconnected, [this] () {
         d->socket->deleteLater();
         deleteLater();
     });
@@ -45,43 +51,60 @@ ConnectionHandler::~ConnectionHandler()
 void ConnectionHandler::parseData()
 {
     qDebug("ConnectionHandler::finishedReading");
-//     // update data
-//     QByteArray data = d->socket->readLine();
-//
-//     // exit if we have no data to parse
-//     if (data.isEmpty()) {
-//         return;
-//     }
-//
-//     // check our data
-//     qDebug() << data;
-//     if (data.startsWith("GET ")) {
-//         d->requestType = GETRequestType;
-//     } else if (data.startsWith("POST ")) {
-//         d->requestType = POSTRequestType;
-//     } else if (data.startsWith("PUT ")) {
-//         d->requestType = PUTRequestType;
-//     } else {
-//         // TODO return error. Kill off request
-//     }
-//
-//     // TODO get request url
-//
-//     qDebug() << d->requestType;
-//
-//
-//     QList<QByteArray> requestParts = data.split(' ');
-//
-//     // be sure to have all parts of the request
-//     if (requestParts.count() > 2) {
-//         // extract url (@1)
-//         QByteArray url = requestParts.at(1);
-//
-//         qDebug() << "url : " << url;
-//
-//         // get scope and method name (TODO, see paper notes on how to handle this part)
-// //         QStringList
-//
-//     }
+
+    while (d->socket->bytesAvailable() != 0) {
+        d->data += d->socket->readAll();
+    }
+
+    qDebug() << "GOT: " << d->data;
+
+    QTextStream streamData(d->data);
+    QString line = streamData.readLine();
+
+    // parse header
+    while (!line.isEmpty()) {
+        qDebug() << "line: " << line;
+
+        // determine request type
+        if (line.contains("HTTP")) {
+            QStringList requestSplit = line.split(' ', QString::SkipEmptyParts);
+
+            // first part of the split contains the request type
+            QString reqTypeStr = requestSplit.first();
+
+            if (reqTypeStr == "GET") {
+                d->requestType = GETRequestType;
+            } else if (reqTypeStr == "POST") {
+                d->requestType = POSTRequestType;
+            } else if (reqTypeStr == "PUT") {
+                d->requestType = PUTRequestType;
+            } else {
+                d->requestType = UnknownRequestType;
+                qDebug("[ConnectionHandler::parseData] UnknownRequestType not handled");
+                return;
+            }
+
+            // second part contains the collection to call
+            if (d->requestType == GETRequestType) {
+                // the GET might have url parameters as well. Check
+                QStringList urlSplit = requestSplit.at(1).split('?');
+                d->requestUrl = urlSplit.first();
+
+                if (urlSplit.count() > 1) {
+                    for (const QString &param : urlSplit.value(1).split('&')) {
+                        d->parameters.insert(param.split('=').first(), param.split('=').last());
+                    }
+                }
+            } else {
+                d->requestUrl = requestSplit.at(1);
+
+                // get POST/PUT data
+            }
+
+            qDebug() << d->requestUrl << " collection to call";
+        }
+
+        line = streamData.readLine();
+    }
 }
 

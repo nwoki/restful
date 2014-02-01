@@ -1,14 +1,19 @@
 #ifndef CONNECTIONHANDLER_H
 #define CONNECTIONHANDLER_H
 
+#include <QtCore/QHash>
 #include <QtCore/QObject>
 
+class Collection;
 class QTcpSocket;
 
 
 /**
  * @brief Handles the ReST connections the http server receives
  * @author Francesco Nwokeka <francesco.nwokeka@gmail.com>
+ *
+ * This class is used to handle incoming requests from clients. It parses the data received
+ * from the socket and calls the correct function on the correct collection.
  */
 class ConnectionHandler : public QObject
 {
@@ -18,10 +23,11 @@ public:
     enum HttpRequestType {
         GETRequestType = 0,
         POSTRequestType,
-        PUTRequestType
+        PUTRequestType,
+        UnknownRequestType
     };
 
-    ConnectionHandler(QTcpSocket *socket, QObject *parent = 0);
+    ConnectionHandler(QTcpSocket *socket, QHash<QString, Collection*> collections, QObject *parent = 0);
     virtual ~ConnectionHandler();
 
 private:

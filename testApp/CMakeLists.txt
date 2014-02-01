@@ -13,6 +13,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(testapp_SRCS
     main.cpp
+#     myresource.cpp
+    mycollection.cpp
 )
 
 

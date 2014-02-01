@@ -1,17 +1,18 @@
 #ifndef COLLECTION_H
 #define COLLECTION_H
 
-#include <QStringList>
-
-class Resource;
+#include <QtCore/QString>
+#include <QtCore/QVariant>
 
 class Collection
 {
 public:
-    Collection(const QString &path, const QStringList &resourceList = QStringList());
+    Collection(const QString &path);
     virtual ~Collection();
 
     QString path() const;
+
+    virtual QByteArray collectionGet(const QString &resource = QString()) = 0;
 
 private:
     class Private;
