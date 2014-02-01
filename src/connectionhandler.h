@@ -27,10 +27,19 @@ public:
         UnknownRequestType
     };
 
+    enum HttpStatusCode {
+        HttpOk = 200,
+        HttpBadRequest = 400,
+        HttpNotFound = 404,
+    };
+
     ConnectionHandler(QTcpSocket *socket, QHash<QString, Collection*> collections, QObject *parent = 0);
     virtual ~ConnectionHandler();
 
+    void setHttpStatusCode(HttpStatusCode code);
+
 private:
+    QString httpStatusCodeToString() const;
     void parseData();
 
     class Private;

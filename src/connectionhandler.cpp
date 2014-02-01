@@ -16,6 +16,7 @@ public:
     QString requestData;
     QVariantHash requestParameters;
     HttpRequestType requestType;
+    HttpStatusCode httpStatusCode;
     QString requestUrl;
 };
 
@@ -25,6 +26,7 @@ ConnectionHandler::ConnectionHandler(QTcpSocket *socket, QHash<QString, Collecti
 {
     d->socket = socket;
     d->collections = collections;
+    d->httpStatusCode = HttpOk;
 
     connect(d->socket, &QIODevice::readyRead, [this] () {
         // parse received data
@@ -47,11 +49,25 @@ ConnectionHandler::~ConnectionHandler()
     delete d;
 }
 
+QString ConnectionHandler::httpStatusCodeToString() const
+{
+    switch (d->httpStatusCode) {
+        case HttpStatusCode::HttpOk:
+            return "HTTP/1.1 200 OK\r\n";
+            break;
+        case HttpStatusCode::HttpBadRequest:
+            return "HTTP/1.1 400 Bad Request\r\n";
+            break;
+        case HttpStatusCode::HttpNotFound:
+            return "HTTP/1.1 404 Not Found\r\n";
+            break;
+        default:
+            return "HTTP/1.1 404 Not Found\r\n";
+    }
+}
 
 void ConnectionHandler::parseData()
 {
-    qDebug("ConnectionHandler::finishedReading");
-
     QByteArray data;
 
     while (d->socket->bytesAvailable() != 0) {
@@ -81,12 +97,19 @@ void ConnectionHandler::parseData()
             } else {
                 d->requestType = UnknownRequestType;
                 qDebug("[ConnectionHandler::parseData] UnknownRequestType not handled");
+
+                d->httpStatusCode = HttpBadRequest;
+
+                // respond to request
+                d->socket->write(httpStatusCodeToString().toUtf8());
+                d->socket->close();
                 return;
             }
 
             // remove trailing '/'
             auto checkTrailingSlash = [this] () {
-                if (d->requestUrl.endsWith('/')) {
+                // in case "/" is requested, we don't want to remove it!!
+                if (d->requestUrl.endsWith('/') && d->requestUrl.size() != 1) {
                     d->requestUrl.remove(d->requestUrl.size() - 1, 1);
                 }
             };
@@ -131,9 +154,10 @@ void ConnectionHandler::parseData()
     // If both tries fail, then the url is not contained in the hash
     auto callCollection = [this] (const QString &requestUrl = QString(), const QString &resource = QString()) {
         QByteArray response;
+        Collection *collection = requestUrl.isEmpty() ? d->collections.value(d->requestUrl) : d->collections.value(requestUrl);
 
         if (d->requestType == GETRequestType) {
-            response = requestUrl.isEmpty() ? d->collections.value(d->requestUrl)->collectionGet(resource) : d->collections.value(requestUrl)->collectionGet(resource);
+            response = collection->collectionGet(resource);
         }
         /*
          * else if (d->requestType == PUTRequestType) {
@@ -143,10 +167,10 @@ void ConnectionHandler::parseData()
          * }
          */
 
-        // TODO allow collection to set http status codes
+        // stash http status code
+        d->httpStatusCode = collection->httpStatusCode();
 
-        // this is hardcoded for now. Will replace soon
-        d->socket->write("HTTP/1.1 200 OK\r\n");
+        d->socket->write(httpStatusCodeToString().toUtf8());
         d->socket->write(QString("Content-Length: %1\r\n\r\n").arg(response.size()).toUtf8());
         d->socket->write(response);
         d->socket->close();
@@ -160,11 +184,29 @@ void ConnectionHandler::parseData()
     if (d->collections.contains(d->requestUrl)) {
         callCollection(d->requestUrl);
     } else if (d->collections.contains(requestUrlWithoutResource)) {
-        qDebug() << "url with resource!";
         callCollection(requestUrlWithoutResource, guessedResource);
     } else {
         // ERROR
         // TODO return bad request/not handled/bla bla bla
+        qDebug("TODO return bad request/not handled/bla bla bla");
+
+        // respond to request
+        d->httpStatusCode = HttpBadRequest;
+        d->socket->write(httpStatusCodeToString().toUtf8());
+        d->socket->close();
     }
+
+
+    if (d->socket->isOpen()) {
+        d->socket->close();
+    }
+
+    return;
 }
+
+void ConnectionHandler::setHttpStatusCode(ConnectionHandler::HttpStatusCode code)
+{
+    d->httpStatusCode = code;
+}
+
 
