@@ -46,6 +46,12 @@ ConnectionHandler::ConnectionHandler(QTcpSocket *socket, QHash<QString, Collecti
 ConnectionHandler::~ConnectionHandler()
 {
     qDebug("[ConnectionHandler::~ConnectionHandler]");
+
+    if (d->socket->isOpen()) {
+        d->socket->close();
+        d->socket->deleteLater();
+    }
+
     delete d;
 }
 
