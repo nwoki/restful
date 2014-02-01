@@ -1,4 +1,4 @@
-#include "collection.h"
+#include <Collection>
 
 class MyCollection : public Collection
 {

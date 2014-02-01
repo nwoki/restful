@@ -1,8 +1,7 @@
 #include <QtCore/QCoreApplication>
 
-// #include "resourcefactory.h"
-#include "server.h"
-// #include "collection.h"
+#include <Server>
+
 #include "mycollection.h"
 
 
