@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 //     server.addRESTUrl("bla bla", ResourceHandler);
 
     server.addCollection(new MyCollection("/test"));
+    server.addCollection(new MyCollection("/"));
 
 
     return app.exec();

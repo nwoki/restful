@@ -164,14 +164,13 @@ void ConnectionHandler::parseData()
 
         if (d->requestType == GETRequestType) {
             response = collection->collectionGet(resource);
+        } else if (d->requestType == POSTRequestType) {
+            response = d->collections.value(d->requestUrl)->collectionPost();
+        } else if (d->requestType == PUTRequestType) {
+            response = d->collections.value(d->requestUrl)->collectionPut();
         }
-        /*
-         * else if (d->requestType == PUTRequestType) {
-         *     response = d->collections.value(d->requestUrl)->collectionGet();
-         * } else if (d->requestType == POSTRequestType) {
-         *     response = d->collections.value(d->requestUrl)->collectionGet();
-         * }
-         */
+
+        // don't need to handle the "else" here, as all methods not available are handled previously during parsing
 
         // stash http status code
         d->httpStatusCode = collection->httpStatusCode();

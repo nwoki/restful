@@ -28,3 +28,14 @@ QByteArray MyCollection::collectionGet(const QString &resource)
 
     return QByteArray("asdasdasda");
 }
+
+QByteArray MyCollection::collectionPost(const QString& resource)
+{
+    return QByteArray("Requested POST");
+}
+
+QByteArray MyCollection::collectionPut(const QString& resource)
+{
+    return QByteArray("Requested PUT");
+}
+
