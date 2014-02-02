@@ -1,6 +1,6 @@
 #include <QtCore/QCoreApplication>
 
-#include <Server>
+#include <RESTFul/Server>
 
 #include "mycollection.h"
 

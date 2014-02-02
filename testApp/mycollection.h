@@ -1,4 +1,4 @@
-#include <Collection>
+#include <RESTFul/Collection>
 
 class MyCollection : public RESTFul::Collection
 {
