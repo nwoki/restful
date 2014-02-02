@@ -14,8 +14,8 @@ public:
     QHash<QString, Collection*> collections;
 
     // request info
-    QString requestData;
-    QVariantHash requestParameters;
+    QByteArray requestData;             // data requested when calling POST/PUT
+    QVariantHash requestParameters;     // data requested when calling GET
     HttpRequestType requestType;
     HttpStatusCode httpStatusCode;
     QString requestUrl;
@@ -146,7 +146,7 @@ void ConnectionHandler::parseData()
     }
 
     // post/put data. Saved "as is" so that developers can handle the data as they wish
-    d->requestData = streamData.readLine();
+    d->requestData = streamData.readLine().toUtf8();
 
 
     // now handle the request url
@@ -164,11 +164,11 @@ void ConnectionHandler::parseData()
         Collection *collection = requestUrl.isEmpty() ? d->collections.value(d->requestUrl) : d->collections.value(requestUrl);
 
         if (d->requestType == GETRequestType) {
-            response = collection->collectionGet(resource);
+            response = collection->collectionGet(resource, d->requestParameters);
         } else if (d->requestType == POSTRequestType) {
-            response = d->collections.value(d->requestUrl)->collectionPost();
+            response = d->collections.value(d->requestUrl)->collectionPost(d->requestData, resource);
         } else if (d->requestType == PUTRequestType) {
-            response = d->collections.value(d->requestUrl)->collectionPut();
+            response = d->collections.value(d->requestUrl)->collectionPut(d->requestData, resource);
         }
 
         // don't need to handle the "else" here, as all methods not available are handled previously during parsing

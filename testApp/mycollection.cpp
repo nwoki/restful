@@ -14,7 +14,7 @@ MyCollection::~MyCollection()
 }
 
 
-QByteArray MyCollection::collectionGet(const QString &resource)
+QByteArray MyCollection::collectionGet(const QString &resource, const QVariantHash &parameters)
 {
     qDebug("[MyCollection::collectionGet]");
 

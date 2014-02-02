@@ -6,5 +6,5 @@ public:
     MyCollection(const QString& path);
     virtual ~MyCollection();
 
-    QByteArray collectionGet(const QString &resource = QString());
+    QByteArray collectionGet(const QString &resource = QString(), const QVariantHash &parameters = QVariantHash());
 };

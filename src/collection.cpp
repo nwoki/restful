@@ -28,19 +28,19 @@ Collection::~Collection()
     delete d;
 }
 
-QByteArray Collection::collectionGet(const QString &resource)
+QByteArray Collection::collectionGet(const QString &resource, const QVariantHash &parameters)
 {
     setHttpStatusCode(ConnectionHandler::HttpNotFound);
     return QByteArray();
 }
 
-QByteArray Collection::collectionPost(const QString &resource)
+QByteArray Collection::collectionPost(const QByteArray &data, const QString &resource)
 {
     setHttpStatusCode(ConnectionHandler::HttpNotFound);
     return QByteArray();
 }
 
-QByteArray Collection::collectionPut(const QString &resource)
+QByteArray Collection::collectionPut(const QByteArray &data, const QString &resource)
 {
     setHttpStatusCode(ConnectionHandler::HttpNotFound);
     return QByteArray();
