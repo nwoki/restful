@@ -22,9 +22,10 @@ public:
 
     ConnectionHandler::HttpStatusCode httpStatusCode() const;
 
-private:
+protected:
     void setHttpStatusCode(ConnectionHandler::HttpStatusCode statusCode);
 
+private:
     class Private;
     Private * const d;
 };
