@@ -1,4 +1,4 @@
-#include "../src/resource.h"
+#include <RESTFul/Resource>
 
 class MyResource : public RESTFul::Resource
 {
