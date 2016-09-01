@@ -1,5 +1,6 @@
 #include "collection.h"
 #include "connectionhandler.h"
+#include "request.h"
 #include "server.h"
 
 #include <QtCore/QDebug>
@@ -13,8 +14,19 @@ namespace RESTFul {
 class Server::Private
 {
 public:
+    Private()
+        : connectionHandler(new ConnectionHandler)
+    {}
+
+    ~Private()
+    {
+        delete connectionHandler;
+    }
+
+
     quint16 port;
-    QHash<QString, Collection*> collections;
+//    QHash<QString, Collection*> collections;
+    ConnectionHandler *connectionHandler;
 };
 
 
@@ -23,10 +35,21 @@ Server::Server(quint16 port, QObject *parent)
     , d(new Private)
 {
     d->port = port;
+}
 
+
+Server::~Server()
+{
+    delete d;
+}
+
+bool Server::start()
+{
     // start listening
     // TODO handle binding error
-    if (listen(QHostAddress::Any, d->port)) {
+    bool result = listen(QHostAddress::Any, d->port);
+
+    if (result) {
         qDebug() << "[Server::Server] listening on: " << d->port;
 
         // get client socket on connect
@@ -44,26 +67,27 @@ Server::Server(quint16 port, QObject *parent)
                 return;
             }
 
-            // create connection obj to handle the http request by itself
-            ConnectionHandler *connHandler = new ConnectionHandler(socket, d->collections);
+            Request *req = new Request(socket);
+            connect(req, &Request::get, d->connectionHandler, &ConnectionHandler::onRequest);
+            connect(req, &Request::post, d->connectionHandler, &ConnectionHandler::onRequest);
+            connect(req, &Request::post, d->connectionHandler, &ConnectionHandler::onRequest);
+            connect(req, &Request::finished, this, &Server::onRequestFinished);
         });
-
     } else {
-        // TODO quit app?
-        qDebug("TODO quit app?");
+        qDebug() << "ERROR starting server: " << errorString();
     }
+
+    return result;
 }
-
-
-Server::~Server()
-{
-    delete d;
-}
-
 
 void Server::addCollection(Collection *collection)
 {
-    d->collections.insert(collection->path(), collection);
+    d->connectionHandler->addCollection(collection);
+}
+
+void Server::onRequestFinished()
+{
+    delete sender();
 }
 
 }

@@ -4,7 +4,6 @@
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 
-class Collection;
 class QTcpSocket;
 
 
@@ -19,39 +18,35 @@ class QTcpSocket;
 namespace RESTFul {
 
 class Collection;
+class Request;
+
 
 class ConnectionHandler : public QObject
 {
     Q_OBJECT
 
 public:
-    enum HttpRequestType {
-        GETRequestType = 0,
-        POSTRequestType,
-        PUTRequestType,
-        UnknownRequestType
-    };
+    ConnectionHandler(QObject *parent = 0);
+    ~ConnectionHandler();
 
-    enum HttpStatusCode {
-        HttpOk = 200,
-        HttpBadRequest = 400,
-        HttpNotFound = 404,
-    };
+    /**
+     * sets the REST url to respond to.(without the domain)
+     * For example: "/urbanterror/people
+     */
+    void addCollection(Collection *collection);
 
-    ConnectionHandler(QTcpSocket *socket, QHash<QString, Collection*> collections, QObject *parent = 0);
-    virtual ~ConnectionHandler();
-
-    void setHttpStatusCode(HttpStatusCode code);
+public Q_SLOTS:
+    void onRequest(const QString &path, const QByteArray &data);
+//    void onGetRequest(/*Request *req,*/ const QString &path);
+//    void onPostRequest(const QString &path, const QByteArray &data);
+//    void onPutRequest(const QString &path, const QByteArray &data);
 
 private:
-    QString httpStatusCodeToString() const;
-    void parseData();
-
     class Private;
     Private * const d;
 };
 
-};
+}   // RESTFul
 
 
 #endif  // CONNECTIONHANDLER_H

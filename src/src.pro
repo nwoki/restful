@@ -1,6 +1,6 @@
 TEMPLATE = lib
 TARGET = restful
-CONFIG += c++11 static
+CONFIG += c++11 shared
 
 # NOTE
 #
@@ -9,6 +9,7 @@ CONFIG += c++11 static
 #   __declspec(dllexport) void MyFunction();
 #   class __declspec(dllexport) MyClass;
 #
+#   This is acheived with the QT macro: Q_DECL_EXPORT which makes the library portable
 
 QT += core network
 
@@ -21,13 +22,20 @@ UI_DIR = $$ROOTDIR/.ui
 MOC_DIR = $$ROOTDIR/.moc
 RCC_DIR = $$ROOTDIR/.rcc
 
-HEADERS += $$PWD/collection.h \
-           $$PWD/connectionhandler.h \
-           $$PWD/server.h
+HEADERS += \
+        $$PWD/collection.h \
+        $$PWD/connectionhandler.h \
+        $$PWD/request.h \
+        $$PWD/requestparser.h \
+        $$PWD/server.h
 
-SOURCES += $$PWD/collection.cpp \
-           $$PWD/connectionhandler.cpp \
-           $$PWD/server.cpp
+SOURCES += \
+        $$PWD/collection.cpp \
+        $$PWD/connectionhandler.cpp \
+        $$PWD/request.cpp \
+        $$PWD/requestparser.cpp \
+        $$PWD/server.cpp
+
 
 
 # used for in-source compiling. Devs point to this folder when compiling the lib in their
