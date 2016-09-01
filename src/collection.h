@@ -30,7 +30,7 @@ private:
     Private * const d;
 };
 
-};
+}   // RESTFul
 
 
 #endif  // COLLECTION_H

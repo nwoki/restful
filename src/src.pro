@@ -23,11 +23,13 @@ RCC_DIR = $$ROOTDIR/.rcc
 
 HEADERS += $$PWD/collection.h \
            $$PWD/connectionhandler.h \
-           $$PWD/server.h
+           $$PWD/server.h \
+    request.h
 
 SOURCES += $$PWD/collection.cpp \
            $$PWD/connectionhandler.cpp \
-           $$PWD/server.cpp
+           $$PWD/server.cpp \
+    request.cpp
 
 
 # used for in-source compiling. Devs point to this folder when compiling the lib in their

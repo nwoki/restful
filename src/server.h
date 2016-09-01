@@ -21,18 +21,28 @@ public:
     virtual ~Server();
 
     /**
+     * @brief listen
+     * starts listening for incoming connections
+     *
+     * @return the result of the binding
+     */
+    bool start();
+
+    /**
      * sets the REST url to respond to.(without the domain)
      * For example: "/urbanterror/people
      */
     void addCollection(Collection *collection);
 
+private Q_SLOTS:
+    void onRequestFinished();
 
 private:
     class Private;
     Private * const d;
 };
 
-};      // RESTFul
+}   // RESTFul
 
 
 

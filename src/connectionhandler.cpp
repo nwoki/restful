@@ -10,211 +10,224 @@ namespace RESTFul {
 class ConnectionHandler::Private
 {
 public:
-    QTcpSocket *socket;
+    Private() {}
+    ~Private() {}
+
+//    QTcpSocket *socket;
     QHash<QString, Collection*> collections;
 
-    // request info
-    QByteArray requestData;             // data requested when calling POST/PUT
-    QVariantHash requestParameters;     // data requested when calling GET
-    HttpRequestType requestType;
-    HttpStatusCode httpStatusCode;
-    QString requestUrl;
+//    // request info
+//    QByteArray requestData;             // data requested when calling POST/PUT
+//    QVariantHash requestParameters;     // data requested when calling GET
+//    ConnectionHandler::HttpRequestType requestType;
+//    ConnectionHandler::HttpStatusCode httpStatusCode;
+//    QString requestUrl;
 };
 
-ConnectionHandler::ConnectionHandler(QTcpSocket *socket, QHash<QString, Collection*> collections, QObject *parent)
+ConnectionHandler::ConnectionHandler(QObject *parent)
     : QObject(parent)
     , d(new Private)
 {
-    d->socket = socket;
-    d->collections = collections;
-    d->httpStatusCode = HttpOk;
+//    qDebug() << "CREATED WITH DATA : " << socket->readAll();
 
-    connect(d->socket, &QIODevice::readyRead, [this] () {
-        // parse received data
-        parseData();
-    });
+//    connect(d->socket, &QIODevice::readyRead, [this] () {
+//        // parse received data from http request
+//        parseData();
+//    });
 
-    // TODO connect on error
+//    // TODO connect on error
 
-    // delete on socket life end
-    connect(d->socket, &QTcpSocket::disconnected, [this] () {
-        d->socket->deleteLater();
-        deleteLater();
-    });
+//    // delete on socket life end
+//    connect(d->socket, &QTcpSocket::disconnected, [this] () {
+////        d->socket->deleteLater();
+////        deleteLater();
+//        delete d->socket;
+//        d->socket = nullptr;
+//    });
 }
 
 
 ConnectionHandler::~ConnectionHandler()
 {
     qDebug("[ConnectionHandler::~ConnectionHandler]");
-
-    if (d->socket->isOpen()) {
-        d->socket->close();
-        d->socket->deleteLater();
-    }
-
     delete d;
 }
 
-QString ConnectionHandler::httpStatusCodeToString() const
+void ConnectionHandler::addCollection(Collection *collection)
 {
-    switch (d->httpStatusCode) {
-        case HttpStatusCode::HttpOk:
-            return "HTTP/1.1 200 OK\r\n";
-            break;
-        case HttpStatusCode::HttpBadRequest:
-            return "HTTP/1.1 400 Bad Request\r\n";
-            break;
-        case HttpStatusCode::HttpNotFound:
-            return "HTTP/1.1 404 Not Found\r\n";
-            break;
-        default:
-            return "HTTP/1.1 404 Not Found\r\n";
-    }
+    d->collections.insert(collection->path(), collection);
 }
 
-void ConnectionHandler::parseData()
-{
-    QByteArray data;
+//void ConnectionHandler::callCollection(const QString &requestUrl, const QString &resource)
+//{
+//    QByteArray response;
+//    Collection *collection = requestUrl.isEmpty() ? d->collections.value(d->requestUrl) : d->collections.value(requestUrl);
 
-    while (d->socket->bytesAvailable() != 0) {
-        data += d->socket->readAll();
-    }
+//    if (d->requestType == GETRequestType) {
+//        response = collection->collectionGet(resource, d->requestParameters);
+//    } else if (d->requestType == POSTRequestType) {
+//        response = d->collections.value(d->requestUrl)->collectionPost(d->requestData, resource);
+//    } else if (d->requestType == PUTRequestType) {
+//        response = d->collections.value(d->requestUrl)->collectionPut(d->requestData, resource);
+//    }
 
-    QTextStream streamData(data);
-    QString line = streamData.readLine();
+//    // don't need to handle the "else" here, as all methods not available are handled previously during parsing
 
-    // parse header
-    while (!line.isEmpty()) {
-        // TODO store "Content-Type"
+//    // stash http status code
+//    d->httpStatusCode = collection->httpStatusCode();
 
-        // determine request type
-        if (line.contains("HTTP")) {
-            QStringList requestSplit = line.split(' ', QString::SkipEmptyParts);
+//    // TODO create proper response
+//    d->socket->write(httpStatusCodeToString().toUtf8());
+//    d->socket->write("Content-Type: \"text/plain\"\r\n");
+//    d->socket->write(QString("Content-Length: %1\r\n").arg(response.size()).toUtf8());
+//    d->socket->write(response + "\r\n");
+//    d->socket->write("Connection: close\r\n");
+//    d->socket->write("\r\n\r\n");   // close
+////    d->socket->close();
+//}
 
-            // first part of the split contains the request type
-            QString reqTypeStr = requestSplit.first();
+//QString ConnectionHandler::httpStatusCodeToString() const
+//{
+//    switch (d->httpStatusCode) {
+//        case HttpStatusCode::HttpOk:
+//            return "HTTP/1.1 200 OK\r\n";
+//            break;
+//        case HttpStatusCode::HttpBadRequest:
+//            return "HTTP/1.1 400 Bad Request\r\n";
+//            break;
+//        case HttpStatusCode::HttpNotFound:
+//            return "HTTP/1.1 404 Not Found\r\n";
+//            break;
+//        default:
+//            return "HTTP/1.1 404 Not Found\r\n";
+//    }
+//}
 
-            if (reqTypeStr == "GET") {
-                d->requestType = GETRequestType;
-            } else if (reqTypeStr == "POST") {
-                d->requestType = POSTRequestType;
-            } else if (reqTypeStr == "PUT") {
-                d->requestType = PUTRequestType;
-            } else {
-                d->requestType = UnknownRequestType;
-                qDebug("[ConnectionHandler::parseData] UnknownRequestType not handled");
+//void ConnectionHandler::parseData()
+//{
+//    qDebug("[ConnectionHandler::parseData]");
 
-                d->httpStatusCode = HttpBadRequest;
-
-                // respond to request
-                d->socket->write(httpStatusCodeToString().toUtf8());
-                d->socket->close();
-                return;
-            }
-
-            // remove trailing '/'
-            auto checkTrailingSlash = [this] () {
-                // in case "/" is requested, we don't want to remove it!!
-                if (d->requestUrl.endsWith('/') && d->requestUrl.size() != 1) {
-                    d->requestUrl.remove(d->requestUrl.size() - 1, 1);
-                }
-            };
-
-            // second part contains the collection to call
-            if (d->requestType == GETRequestType) {
-                // the GET might have url parameters as well. Check
-                QStringList urlSplit = requestSplit.at(1).split('?');
-                d->requestUrl = urlSplit.first();
-                checkTrailingSlash();
-
-                if (urlSplit.count() > 1) {
-                    for (const QString &param : urlSplit.value(1).split('&')) {
-                        d->requestParameters.insert(param.split('=').first(), param.split('=').last());
-                    }
-                }
-            } else {
-                d->requestUrl = requestSplit.at(1);
-                checkTrailingSlash();
-
-                // post/put data comes after a new line break which is what makes the while loop exit.
-                // so the parsing is done outside
-            }
-        }
-
-        line = streamData.readLine();
-    }
-
-    // post/put data. Saved "as is" so that developers can handle the data as they wish
-    d->requestData = streamData.readLine().toUtf8();
+//    // remove trailing '/'
+//    auto checkTrailingSlash = [this] () {
+//        // in case "/" is requested, we don't want to remove it!!
+//        if (d->requestUrl.endsWith('/') && d->requestUrl.size() != 1) {
+//            d->requestUrl.remove(d->requestUrl.size() - 1, 1);
+//        }
+//    };
 
 
-    // now handle the request url
 
-    // as there's no way of telling if the url is pointing to a resource on a collection
-    // or to the whole collection, I have to check for the url validity
-    //
-    // if the full url is not contained in the hash, then MAYBE the last part of the
-    // url (after the last '/') is the resource. So I try checking if the hash contains the
-    // url without the last part.
-    //
-    // If both tries fail, then the url is not contained in the hash
-    auto callCollection = [this] (const QString &requestUrl = QString(), const QString &resource = QString()) {
-        QByteArray response;
-        Collection *collection = requestUrl.isEmpty() ? d->collections.value(d->requestUrl) : d->collections.value(requestUrl);
+//    QByteArray data;
 
-        if (d->requestType == GETRequestType) {
-            response = collection->collectionGet(resource, d->requestParameters);
-        } else if (d->requestType == POSTRequestType) {
-            response = d->collections.value(d->requestUrl)->collectionPost(d->requestData, resource);
-        } else if (d->requestType == PUTRequestType) {
-            response = d->collections.value(d->requestUrl)->collectionPut(d->requestData, resource);
-        }
+//    while (d->socket->bytesAvailable() != 0) {
+//        data += d->socket->readAll();
+//    }
 
-        // don't need to handle the "else" here, as all methods not available are handled previously during parsing
+//    qDebug() << "DATA -> " << data;
 
-        // stash http status code
-        d->httpStatusCode = collection->httpStatusCode();
+//    QTextStream streamData(data);
+//    QString line = streamData.readLine();
 
-        d->socket->write(httpStatusCodeToString().toUtf8());
-        d->socket->write(QString("Content-Length: %1\r\n\r\n").arg(response.size()).toUtf8());
-        d->socket->write(response);
-        d->socket->close();
-    };
+//    // parse header
+//    while (!line.isEmpty()) {
+//        // TODO store "Content-Type"
+
+//        // determine request type
+//        if (line.contains("HTTP")) {
+//            QStringList requestSplit = line.split(' ', QString::SkipEmptyParts);
+
+//            // first part of the split contains the request type
+//            QString reqTypeStr = requestSplit.first();
+
+//            if (reqTypeStr == "GET") {
+//                d->requestType = GETRequestType;
+//            } else if (reqTypeStr == "POST") {
+//                d->requestType = POSTRequestType;
+//            } else if (reqTypeStr == "PUT") {
+//                d->requestType = PUTRequestType;
+//            } else {
+//                d->requestType = UnknownRequestType;
+//                qDebug("[ConnectionHandler::parseData] UnknownRequestType not handled");
+
+//                d->httpStatusCode = HttpBadRequest;
+
+//                // respond to request
+//                d->socket->write(httpStatusCodeToString().toUtf8());
+//                d->socket->close();
+//                return;
+//            }
+
+//            // second part contains the collection to call
+//            if (d->requestType == GETRequestType) {
+//                // the GET might have url parameters as well. Check
+//                QStringList urlSplit = requestSplit.at(1).split('?');
+//                d->requestUrl = urlSplit.first();
+//                checkTrailingSlash();
+
+//                if (urlSplit.count() > 1) {
+//                    for (const QString &param : urlSplit.value(1).split('&')) {
+//                        d->requestParameters.insert(param.split('=').first(), param.split('=').last());
+//                    }
+//                }
+//            } else {
+//                d->requestUrl = requestSplit.at(1);
+//                checkTrailingSlash();
+
+//                // post/put data comes after a new line break which is what makes the while loop exit.
+//                // so the parsing is done outside
+//            }
+//        }
+
+//        line = streamData.readLine();
+//    }
+
+//    // post/put data. Saved "as is" so that developers can handle the data as they wish
+//    d->requestData = streamData.readLine().toUtf8();
+
+//    qDebug() << "REQ DATA: " << d->requestData;
 
 
-    QString guessedResource = d->requestUrl.split('/').last();
-    QString requestUrlWithoutResource = d->requestUrl.left(d->requestUrl.indexOf("/" + guessedResource));
+//    // now handle the request url
+//    QString guessedResource = d->requestUrl.split('/').last();
+//    QString requestUrlWithoutResource = d->requestUrl.left(d->requestUrl.indexOf("/" + guessedResource));
 
-    // call collection
-    if (d->collections.contains(d->requestUrl)) {
-        callCollection(d->requestUrl);
-    } else if (d->collections.contains(requestUrlWithoutResource)) {
-        callCollection(requestUrlWithoutResource, guessedResource);
-    } else {
-        // ERROR
-        // TODO return bad request/not handled/bla bla bla
-        qDebug("TODO return bad request/not handled/bla bla bla");
-
-        // respond to request
-        d->httpStatusCode = HttpBadRequest;
-        d->socket->write(httpStatusCodeToString().toUtf8());
-        d->socket->close();
-    }
+//    qDebug() << "REQ URL: " << d->requestUrl;
+//    qDebug() << "REQ PAR: " << d->requestParameters;
+//    qDebug() << "REQ DATA: " << d->requestData;
+//    qDebug() << "GUESSED : " << guessedResource;
 
 
-    if (d->socket->isOpen()) {
-        d->socket->close();
-    }
+//    qDebug() << "My collections are: " << d->collections.keys();
 
-    return;
+//    // call collection
+//    if (d->collections.contains(d->requestUrl)) {
+//        callCollection(d->requestUrl);
+//    } else if (d->collections.contains(requestUrlWithoutResource)) {
+//        callCollection(requestUrlWithoutResource, guessedResource);
+//    } else {
+//        // ERROR
+//        // TODO return bad request/not handled/bla bla bla
+//        qDebug("TODO return bad request/not handled/bla bla bla");
+
+//        // respond to request
+//        d->httpStatusCode = HttpBadRequest;
+//        d->socket->write(httpStatusCodeToString().toUtf8());
+//        d->socket->close();
+//    }
+
+
+//    if (d->socket->isOpen()) {
+//        d->socket->close();
+//    }
+
+//    return;
+//}
+
+//void ConnectionHandler::setHttpStatusCode(ConnectionHandler::HttpStatusCode code)
+//{
+//    d->httpStatusCode = code;
+//}
+
 }
-
-void ConnectionHandler::setHttpStatusCode(ConnectionHandler::HttpStatusCode code)
-{
-    d->httpStatusCode = code;
-}
-
-};
 
 

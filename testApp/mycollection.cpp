@@ -2,20 +2,18 @@
 
 #include <QtCore/QDebug>
 
-MyCollection::MyCollection(const QString& path): Collection(path)
+MyCollection::MyCollection(const QString& path)
+    : Collection(path)
 {
-
 }
-
 
 MyCollection::~MyCollection()
 {
-
 }
-
 
 QByteArray MyCollection::collectionGet(const QString &resource, const QVariantHash &parameters)
 {
+    Q_UNUSED (parameters);
     qDebug("[MyCollection::collectionGet]");
 
     qDebug() << "resource: " << resource;

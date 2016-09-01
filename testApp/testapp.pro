@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = testApp
-CONFIG += c++11 console
+CONFIG += c++11
 
 QT += core network
 
