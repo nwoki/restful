@@ -1,6 +1,6 @@
 TEMPLATE = lib
 TARGET = restful
-CONFIG += c++11 static
+CONFIG += c++11 shared
 
 # NOTE
 #
@@ -9,6 +9,7 @@ CONFIG += c++11 static
 #   __declspec(dllexport) void MyFunction();
 #   class __declspec(dllexport) MyClass;
 #
+#   This is acheived with the QT macro: Q_DECL_EXPORT which makes the library portable
 
 QT += core network
 
