@@ -1,5 +1,5 @@
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef RESTFUL_REQUESTSERVER_H
+#define RESTFUL_REQUESTSERVER_H
 
 #include <QtNetwork/QTcpServer>
 
@@ -12,13 +12,13 @@ namespace RESTFul {
 
 class Collection;
 
-class Server : public QTcpServer
+class RequestServer : public QTcpServer
 {
     Q_OBJECT
 
 public:
-    Q_DECL_EXPORT Server(quint16 port, QObject *parent = 0);
-    Q_DECL_EXPORT virtual ~Server();
+    Q_DECL_EXPORT RequestServer(quint16 port, QObject *parent = 0);
+    Q_DECL_EXPORT virtual ~RequestServer();
 
     /**
      * @brief listen
@@ -46,4 +46,4 @@ private:
 
 
 
-#endif  // SERVER_H
+#endif  // RESTFUL_REQUESTSERVER_H

@@ -1,5 +1,5 @@
-#ifndef REQUESTPARSER_H
-#define REQUESTPARSER_H
+#ifndef RESTFUL_REQUESTPARSER_H
+#define RESTFUL_REQUESTPARSER_H
 
 #include <QtCore/QObject>
 
@@ -33,4 +33,4 @@ private:
 
 }   // RESTFul
 
-#endif // REQUESTPARSER_H
+#endif // RESTFUL_REQUESTPARSER_H

@@ -27,14 +27,14 @@ HEADERS += \
         $$PWD/connectionhandler.h \
         $$PWD/request.h \
         $$PWD/requestparser.h \
-        $$PWD/server.h
+        $$PWD/requestserver.h
 
 SOURCES += \
         $$PWD/collection.cpp \
         $$PWD/connectionhandler.cpp \
         $$PWD/request.cpp \
         $$PWD/requestparser.cpp \
-        $$PWD/server.cpp
+        $$PWD/requestserver.cpp
 
 
 
@@ -43,4 +43,4 @@ SOURCES += \
 OTHER_FILES += \
     $$PWD/../include/RESTFul/Collection \
     $$PWD/../include/RESTFul/Resource \
-    $$PWD/../include/RESTFul/Server
+    $$PWD/../include/RESTFul/RequestServer

@@ -1,5 +1,5 @@
-#ifndef CONNECTIONHANDLER_H
-#define CONNECTIONHANDLER_H
+#ifndef RESTFUL_CONNECTIONHANDLER_H
+#define RESTFUL_CONNECTIONHANDLER_H
 
 #include <QtCore/QHash>
 #include <QtCore/QObject>
@@ -49,4 +49,4 @@ private:
 }   // RESTFul
 
 
-#endif  // CONNECTIONHANDLER_H
+#endif  // RESTFUL_CONNECTIONHANDLER_H

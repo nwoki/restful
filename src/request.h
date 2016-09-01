@@ -1,5 +1,5 @@
-#ifndef REQUEST_H
-#define REQUEST_H
+#ifndef RESTFUL_REQUEST_H
+#define RESTFUL_REQUEST_H
 
 #include <QtCore/QObject>
 
@@ -75,4 +75,4 @@ private:
 
 }   // RESTFul
 
-#endif // REQUEST_H
+#endif // RESTFUL_REQUEST_H

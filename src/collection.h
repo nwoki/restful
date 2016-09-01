@@ -1,5 +1,5 @@
-#ifndef COLLECTION_H
-#define COLLECTION_H
+#ifndef RESTFUL_COLLECTION_H
+#define RESTFUL_COLLECTION_H
 
 #include "connectionhandler.h"
 
@@ -28,4 +28,4 @@ private:
 }   // RESTFul
 
 
-#endif  // COLLECTION_H
+#endif  // RESTFUL_COLLECTION_H
