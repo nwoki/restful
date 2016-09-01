@@ -20,11 +20,6 @@ public:
     virtual QByteArray collectionPost(const QByteArray &data,   const QString &resource = QString());
     virtual QByteArray collectionPut(const QByteArray &data, const QString &resource = QString());
 
-    ConnectionHandler::HttpStatusCode httpStatusCode() const;
-
-protected:
-    void setHttpStatusCode(ConnectionHandler::HttpStatusCode statusCode);
-
 private:
     class Private;
     Private * const d;

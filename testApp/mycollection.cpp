@@ -1,6 +1,7 @@
 #include "mycollection.h"
 
 #include <QtCore/QDebug>
+#include <QtCore/QJsonDocument>
 
 MyCollection::MyCollection(const QString& path)
     : Collection(path)
@@ -14,9 +15,14 @@ MyCollection::~MyCollection()
 QByteArray MyCollection::collectionGet(const QString &resource, const QVariantHash &parameters)
 {
     Q_UNUSED (parameters);
-    qDebug("[MyCollection::collectionGet]");
 
-    qDebug() << "resource: " << resource;
+    QVariantMap root;
+    QVariantMap data;
+
+    data.insert("id", "TestJson");
+    data.insert("text", "hello world!");
+
+    root.insert("data", data);
 
     if (resource.isEmpty()) {
         qDebug("return entire collection");
@@ -24,5 +30,5 @@ QByteArray MyCollection::collectionGet(const QString &resource, const QVariantHa
         qDebug("return resource");
     }
 
-    return QByteArray("asdasdasda");
+    return QJsonDocument::fromVariant(root).toJson();
 }

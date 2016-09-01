@@ -18,6 +18,7 @@ class QTcpSocket;
 namespace RESTFul {
 
 class Collection;
+class Request;
 
 
 class ConnectionHandler : public QObject
@@ -25,19 +26,6 @@ class ConnectionHandler : public QObject
     Q_OBJECT
 
 public:
-    enum HttpRequestType {
-        GETRequestType = 0,
-        POSTRequestType,
-        PUTRequestType,
-        UnknownRequestType
-    };
-
-    enum HttpStatusCode {
-        HttpOk = 200,
-        HttpBadRequest = 400,
-        HttpNotFound = 404,
-    };
-
     ConnectionHandler(QObject *parent = 0);
     ~ConnectionHandler();
 
@@ -48,6 +36,12 @@ public:
     void addCollection(Collection *collection);
 
 //    void setHttpStatusCode(HttpStatusCode code);
+
+public Q_SLOTS:
+    void onRequest(const QString &path, const QByteArray &data);
+//    void onGetRequest(/*Request *req,*/ const QString &path);
+//    void onPostRequest(const QString &path, const QByteArray &data);
+//    void onPutRequest(const QString &path, const QByteArray &data);
 
 private:
 

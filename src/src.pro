@@ -21,15 +21,20 @@ UI_DIR = $$ROOTDIR/.ui
 MOC_DIR = $$ROOTDIR/.moc
 RCC_DIR = $$ROOTDIR/.rcc
 
-HEADERS += $$PWD/collection.h \
-           $$PWD/connectionhandler.h \
-           $$PWD/server.h \
-    request.h
+HEADERS += \
+        $$PWD/collection.h \
+        $$PWD/connectionhandler.h \
+        $$PWD/request.h \
+        $$PWD/requestparser.h \
+        $$PWD/server.h
 
-SOURCES += $$PWD/collection.cpp \
-           $$PWD/connectionhandler.cpp \
-           $$PWD/server.cpp \
-    request.cpp
+SOURCES += \
+        $$PWD/collection.cpp \
+        $$PWD/connectionhandler.cpp \
+        $$PWD/request.cpp \
+        $$PWD/requestparser.cpp \
+        $$PWD/server.cpp
+
 
 
 # used for in-source compiling. Devs point to this folder when compiling the lib in their

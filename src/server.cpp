@@ -68,9 +68,9 @@ bool Server::start()
             }
 
             Request *req = new Request(socket);
-//            connect(req, &Request, )  // GET
-//            connect                   // POST
-//            connect                   // PUT
+            connect(req, &Request::get, d->connectionHandler, &ConnectionHandler::onRequest);
+            connect(req, &Request::post, d->connectionHandler, &ConnectionHandler::onRequest);
+            connect(req, &Request::post, d->connectionHandler, &ConnectionHandler::onRequest);
             connect(req, &Request::finished, this, &Server::onRequestFinished);
         });
     } else {
@@ -87,7 +87,6 @@ void Server::addCollection(Collection *collection)
 
 void Server::onRequestFinished()
 {
-    qDebug() << "sender -> " << sender();
     delete sender();
 }
 
