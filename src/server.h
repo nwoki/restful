@@ -17,8 +17,8 @@ class Server : public QTcpServer
     Q_OBJECT
 
 public:
-    Server(quint16 port, QObject *parent = 0);
-    virtual ~Server();
+    Q_DECL_EXPORT Server(quint16 port, QObject *parent = 0);
+    Q_DECL_EXPORT virtual ~Server();
 
     /**
      * @brief listen
@@ -26,13 +26,13 @@ public:
      *
      * @return the result of the binding
      */
-    bool start();
+    Q_DECL_EXPORT bool start();
 
     /**
      * sets the REST url to respond to.(without the domain)
      * For example: "/urbanterror/people
      */
-    void addCollection(Collection *collection);
+    Q_DECL_EXPORT void addCollection(Collection *collection);
 
 private Q_SLOTS:
     void onRequestFinished();
